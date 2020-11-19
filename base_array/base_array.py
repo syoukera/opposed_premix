@@ -41,4 +41,33 @@ class TemperatureArray(BaseArray):
         self.coef_b = np.ones(self.num_grid) * 0.0
         self.coef_c = np.ones(self.num_grid) * 0.0
         self.coef_d = np.ones(self.num_grid) * 1.0
-        
+
+class DensityArray(BaseArray):
+    '''Variable array for density'''
+    
+    def calc_coef(self):
+        '''Calculate coefficients for TDMA'''
+        self.coef_a = np.ones(self.num_grid) * 1.0
+        self.coef_b = np.ones(self.num_grid) * 0.0
+        self.coef_c = np.ones(self.num_grid) * 0.0
+        self.coef_d = np.ones(self.num_grid) * 1.0
+
+class VelocityArray(BaseArray):
+    '''Variable array for velocity'''
+    
+    def calc_coef(self):
+        '''Calculate coefficients for TDMA'''
+        self.coef_a = np.ones(self.num_grid) * 1.0
+        self.coef_b = np.ones(self.num_grid) * 0.0
+        self.coef_c = np.ones(self.num_grid) * 0.0
+        self.coef_d = np.ones(self.num_grid) * 1.0
+
+class PressureArray(BaseArray):
+    '''Variable array for pressure'''
+    
+    def calc_coef(self):
+        '''Calculate coefficients for TDMA'''
+        self.coef_a = np.ones(self.num_grid) * 1.0
+        self.coef_b = np.ones(self.num_grid) * 0.0
+        self.coef_c = np.ones(self.num_grid) * 0.0
+        self.coef_d = np.ones(self.num_grid) * 1.0

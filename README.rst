@@ -1,10 +1,6 @@
-Sample Module Repository
+opposed_premix
 ========================
 
-This simple project is an example repo for Python projects.
-
-`Learn more <http://www.kennethreitz.org/essays/repository-structure-and-python>`_.
+A package for Combustion simulation in a geometory of 1D opposed premix flow.
 
 ---------------
-
-If you want to learn more about ``setup.py`` files, check out `this repository <https://github.com/kennethreitz/setup.py>`_.

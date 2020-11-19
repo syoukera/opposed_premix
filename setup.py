@@ -12,13 +12,14 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='sample',
+    name='opposed_premix',
     version='0.1.0',
-    description='Sample package for Python-Guide.org',
+    description='A package for Combustion simulation in a geometory of 1D opposed premix flow.',
     long_description=readme,
-    author='Kenneth Reitz',
-    author_email='me@kennethreitz.com',
-    url='https://github.com/kennethreitz/samplemod',
+    author='Akira Shioyoke',
+    author_email='s.akira2986@gmail.com',
+    install_requires=['cantera', 'numpy', 'pandas', 'tqdm', 'scipy', 'matplotlib'],
+    url='',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )

@@ -34,13 +34,13 @@ class BaseArray():
         self.variable_array_s[:-1] += self.variable_array[1:].copy()
         self.variable_array_s[:-1] /= 2
     
-    def interpolate(self, name):
+    def interpolate(self):
         '''Interpolate and assign variables from other value arrays'''
 
         df_ck = self.parent_solution.df_ck
 
         dis = df_ck['Distance (cm)'].to_numpy()
-        phi = df_ck[name].to_numpy()
+        phi = df_ck[self.kind].to_numpy()
 
         f = interp.interp1d(dis, phi, kind="cubic")
         self.variable_array = f(self.y)
@@ -62,6 +62,10 @@ class StateVariablesArray(BaseArray):
 
 class TemperatureArray(StateVariablesArray):
     '''Variable array for temperature'''
+
+    def __init__(self, parent, n, var=None):
+        super().__init__(parent, n, var)
+        self.kind = 'Temperature (K)'
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''
@@ -70,11 +74,12 @@ class TemperatureArray(StateVariablesArray):
         self.coef_c = np.ones(self.num_grid) * 0.0
         self.coef_d = np.ones(self.num_grid) * 1.0
 
-    def get_density_array(self):
-        pass
-
 class DensityArray(StateVariablesArray):
     '''Variable array for density'''
+    
+    def __init__(self, parent, n, var=None):
+        super().__init__(parent, n, var)
+        self.kind = 'Density (g/cm3)'
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''
@@ -86,6 +91,10 @@ class DensityArray(StateVariablesArray):
 class VelocityArray(StateVariablesArray):
     '''Variable array for velocity'''
 
+    def __init__(self, parent, n, var=None):
+        super().__init__(parent, n, var)
+        self.kind = 'Axial_velocity (cm/sec)'
+    
     def average_variables(self):
         '''
         Average variables at intermediate grid point
@@ -106,6 +115,10 @@ class VelocityArray(StateVariablesArray):
 
 class PressureArray(StateVariablesArray):
     '''Variable array for pressure'''
+
+    def __init__(self, parent, n, var=None):
+        super().__init__(parent, n, var)
+        self.kind = 'Pressure (atm)'
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''

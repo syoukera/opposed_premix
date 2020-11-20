@@ -1,14 +1,19 @@
 import numpy as np
+import scipy.interpolate as interp
 import sys
+
 
 class BaseArray():
     '''Base class for variables array'''
     
     def __init__(self, parent, n, var=None):
+        self.kind = 'Base'
+
         self.parent_solution = parent
 
         self.num_grid = n
         self.variable_array = np.zeros(self.num_grid)
+        self.y = self.parent_solution.y
         
         if var is None:
             pass
@@ -19,9 +24,28 @@ class BaseArray():
                 sys.exit('Exception: Thrown vals has different shape.')
 
     def average_variables(self):
-        '''Average variables for using in stagard grid'''
-        pass                
+        '''
+        Average variables at intermediate grid point
+        for variable in stagard grid
+        's' means Small case
+        '''
 
+        self.variable_array_s = self.variable_array.copy()
+        self.variable_array_s[:-1] += self.variable_array[1:].copy()
+        self.variable_array_s[:-1] /= 2
+    
+    def interpolate(self, name):
+        '''Interpolate and assign variables from other value arrays'''
+
+        df_ck = self.parent_solution.df_ck
+
+        dis = df_ck['Distance (cm)'].to_numpy()
+        phi = df_ck[name].to_numpy()
+
+        f = interp.interp1d(dis, phi, kind="cubic")
+        self.variable_array = f(self.y)
+
+        
 class StateVariablesArray(BaseArray):
     '''Variable array for state variables'''
 
@@ -34,10 +58,6 @@ class StateVariablesArray(BaseArray):
         
     def solve_TDMA(self):
         '''Solve TDMA for own variable_array'''
-        pass
-    
-    def interpolate(self):
-        '''Interpolate and assign variables from other value arrays'''
         pass
 
 class TemperatureArray(StateVariablesArray):
@@ -65,6 +85,17 @@ class DensityArray(StateVariablesArray):
 
 class VelocityArray(StateVariablesArray):
     '''Variable array for velocity'''
+
+    def average_variables(self):
+        '''
+        Average variables at intermediate grid point
+        for velocity in stagard grid
+        'u' means Upper case
+        '''
+
+        self.variable_array_u = self.variable_array.copy()
+        self.variable_array_u[1:] += self.variable_array[:-1].copy()
+        self.variable_array_u[1:] /= 2
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''

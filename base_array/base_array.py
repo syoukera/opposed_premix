@@ -6,14 +6,18 @@ import sys
 class BaseArray():
     '''Base class for variables array'''
     
-    def __init__(self, parent, n, var=None):
+    def __init__(self, parent, var=None):
         self.kind = 'Base'
 
+        # Assign parent solution
         self.parent_solution = parent
 
-        self.num_grid = n
-        self.variable_array = np.zeros(self.num_grid)
+        # Read parent parameters 
         self.y = self.parent_solution.y
+        self.num_grid = self.parent_solution.num_grid
+
+        # Define my own variables
+        self.variable_array = np.zeros(self.num_grid)
         
         if var is None:
             pass
@@ -49,8 +53,8 @@ class BaseArray():
 class StateVariablesArray(BaseArray):
     '''Variable array for state variables'''
 
-    def __init__(self, parent, n, var=None):
-        super().__init__(parent, n, var)
+    def __init__(self, parent, var=None):
+        super().__init__(parent, var)
         self.coef_a = np.zeros(self.num_grid)
         self.coef_b = np.zeros(self.num_grid)
         self.coef_c = np.zeros(self.num_grid)
@@ -63,8 +67,8 @@ class StateVariablesArray(BaseArray):
 class TemperatureArray(StateVariablesArray):
     '''Variable array for temperature'''
 
-    def __init__(self, parent, n, var=None):
-        super().__init__(parent, n, var)
+    def __init__(self, parent, var=None):
+        super().__init__(parent, var)
         self.kind = 'Temperature (K)'
     
     def calc_coef(self):
@@ -77,8 +81,8 @@ class TemperatureArray(StateVariablesArray):
 class DensityArray(StateVariablesArray):
     '''Variable array for density'''
     
-    def __init__(self, parent, n, var=None):
-        super().__init__(parent, n, var)
+    def __init__(self, parent, var=None):
+        super().__init__(parent, var)
         self.kind = 'Density (g/cm3)'
     
     def calc_coef(self):
@@ -91,8 +95,8 @@ class DensityArray(StateVariablesArray):
 class VelocityArray(StateVariablesArray):
     '''Variable array for velocity'''
 
-    def __init__(self, parent, n, var=None):
-        super().__init__(parent, n, var)
+    def __init__(self, parent, var=None):
+        super().__init__(parent, var)
         self.kind = 'Axial_velocity (cm/sec)'
     
     def average_variables(self):
@@ -116,8 +120,8 @@ class VelocityArray(StateVariablesArray):
 class PressureArray(StateVariablesArray):
     '''Variable array for pressure'''
 
-    def __init__(self, parent, n, var=None):
-        super().__init__(parent, n, var)
+    def __init__(self, parent, var=None):
+        super().__init__(parent, var)
         self.kind = 'Pressure (atm)'
     
     def calc_coef(self):

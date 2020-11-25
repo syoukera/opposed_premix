@@ -1,5 +1,7 @@
 from .base_array import *
+import cantera as ct
 import numpy as np
+import pickle
 import scipy.interpolate as interp
 
 class StateVariablesArray(BaseArray):
@@ -176,3 +178,61 @@ class PressureArray(StateVariablesArray):
         self.coef_b = np.ones(self.num_grid) * 0.0
         self.coef_c = np.ones(self.num_grid) * 0.0
         self.coef_d = np.ones(self.num_grid) * 1.0
+
+class MoleFractionArray(StateVariablesArray):
+    '''Variable array for pressure'''
+
+    def __init__(self, parent, name, var=None):
+        super().__init__(parent, var)
+        self.name = name
+    
+    def calc_coef(self):
+        '''Calculate coefficients for TDMA'''
+        self.coef_a = np.ones(self.num_grid) * 1.0
+        self.coef_b = np.ones(self.num_grid) * 0.0
+        self.coef_c = np.ones(self.num_grid) * 0.0
+        self.coef_d = np.ones(self.num_grid) * 1.0
+
+    def interpolate(self):
+        '''Interpolate and assign variables from other value arrays'''
+
+        df_ck = self.parent_solution.df_ck
+
+        dis = df_ck['Distance (cm)'].to_numpy()
+        
+        name = 'Mole_fraction_' + self.name + ' ()'
+        phi = df_ck[name].to_numpy()
+
+        f = interp.interp1d(dis, phi, kind="cubic")
+        self.variable_array = f(self.y)
+
+class MoleFractionList():
+    '''List of Array for Mole Fractions'''
+
+    def __init__(self, parent, var=None):
+        # Assign parent solution
+        self.parent_solution = parent
+
+        # Get species name of cti and csv
+        # CTI means names from get from cantera chemistry set
+        self.name_species_cti = ct.Solution('gri30.xml').species_names
+
+        # CK means names imported from CHEMKIN-PRO result
+        with open('data/species_name_ck.txt', 'rb') as f:
+            self.name_species_ck = pickle.load(f)
+
+        # Make list of MoleFractionArray
+        self.mf_array_list = []
+
+        for name in self.name_species_cti:
+            arr = MoleFractionArray(self.parent_solution, name)
+            self.mf_array_list.append(arr)
+
+    def interpolate_mole_fraction_arrays(self):
+        '''Interpolate each array in list'''
+        
+        for arr in self.mf_array_list:
+            if arr.name in self.name_species_ck:
+                arr.interpolate()
+            else:
+                arr.variable_array = 0.0

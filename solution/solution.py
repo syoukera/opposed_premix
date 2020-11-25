@@ -5,9 +5,7 @@ import base_array
 class BaseSolution():
     '''Base solution class for simulation'''
 
-    def __init__(self, name=None):
-        self.name = name
-
+    def __init__(self):
         self.length = 10 # cm
         self.num_grid = 2001
 
@@ -17,7 +15,7 @@ class BaseSolution():
 
         # calculation time
         self.start_time = 0.0
-        self.end_time   = 1e-4
+        self.end_time   = 1e-3
         self.dt         = 1e-6
 
         # calclation step
@@ -28,17 +26,17 @@ class BaseSolution():
         self.df_ck = pd.read_csv(self.path_ck)
 
         # Declear array of state variables
-        self.R_array = base_array.DensityArray(parent=self)
-        self.P_array = base_array.PressureArray(parent=self)
-        self.T_array = base_array.TemperatureArray(parent=self)
-        self.V_array = base_array.AxialVelocityArray(parent=self)
-        self.G_array = base_array.RadialVelocityArray(parent=self)
+        self.R = base_array.DensityArray(parent=self)
+        self.P = base_array.PressureArray(parent=self)
+        self.T = base_array.TemperatureArray(parent=self)
+        self.V = base_array.AxialVelocityArray(parent=self)
+        self.G = base_array.RadialVelocityArray(parent=self)
 
         # Declear array of parameters
-        self.mu_array = base_array.ParameterArray(parent=self, name='Mixture_viscosity (g/cm-sec)')
-        self.cp_array = base_array.ParameterArray(parent=self, name='Specific_heat_Cp (erg/g-K)')
-        self.lm_array = base_array.ParameterArray(parent=self, name='Mixture_thermal_conductivity (erg/cm-K-sec)')
-        self.TPG_array = base_array.ParameterArray(parent=self, name='Pressure_gradient (g/cm3-s2)')
+        self.mu  = base_array.ParameterArray(parent=self, name='Mixture_viscosity (g/cm-sec)')
+        self.cp  = base_array.ParameterArray(parent=self, name='Specific_heat_Cp (erg/g-K)')
+        self.lm  = base_array.ParameterArray(parent=self, name='Mixture_thermal_conductivity (erg/cm-K-sec)')
+        self.TPG = base_array.ParameterArray(parent=self, name='Pressure_gradient (g/cm3-s2)')
 
     def solve(self):
         '''Solve probrems using TDMA and SIMPLE method'''
@@ -57,27 +55,27 @@ class BaseSolution():
     def time_step(self):
         '''Progress a time step'''
 
-        self.G_array.solve()
+        self.G.solve()
 
     def initialize_arrays(self):
         '''Initialize solved arrays'''
         
-        self.G_array.initialize()
+        self.G.initialize()
 
     def interporate_arrays(self):
         '''Interpolate required arrays'''
 
         # State variables array
-        self.V_array.interpolate()
-        self.R_array.interpolate()
+        self.V.interpolate()
+        self.R.interpolate()
 
         # Parameter array
-        self.mu_array.interpolate()
-        self.TPG_array.interpolate()
+        self.mu.interpolate()
+        self.TPG.interpolate()
 
     def average_arrays(self):
         '''Average operation for required arrays'''
 
-        self.V_array.average_variables()
-        self.mu_array.average_variables()
+        self.V.average_variables()
+        self.mu.average_variables()
 

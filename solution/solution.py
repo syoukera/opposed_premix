@@ -22,7 +22,8 @@ class BaseSolution():
         self.R_array = base_array.DensityArray(parent=self)
         self.P_array = base_array.PressureArray(parent=self)
         self.T_array = base_array.TemperatureArray(parent=self)
-        self.V_array = base_array.VelocityArray(parent=self)
+        self.V_array = base_array.AxialVelocityArray(parent=self)
+        self.G_array = base_array.RadialVelocityArray(parent=self)
 
     def solve(self):
         '''Solve probrems using TDMA and SIMPLE method'''

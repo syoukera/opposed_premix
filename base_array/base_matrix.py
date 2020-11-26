@@ -17,7 +17,7 @@ class BaseMatrix():
         self.dt = self.parent_solution.dt
 
         # Define my own variables
-        self.variable_array = np.zeros(self.num_grid, self.num_species)
+        self.variable_array = np.zeros((self.num_grid, self.num_species))
         
     def average_variables(self):
         '''
@@ -27,8 +27,8 @@ class BaseMatrix():
         '''
 
         self.variable_array_s = self.variable_array.copy()
-        self.variable_array_s[:-1] += self.variable_array[1:].copy()
-        self.variable_array_s[:-1] /= 2
+        self.variable_array_s[:-1, :] += self.variable_array[1:, :].copy()
+        self.variable_array_s[:-1, :] /= 2
 
 class ParameterMatrix(BaseMatrix):
     '''Variable matrix for parameter variables'''

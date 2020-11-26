@@ -63,8 +63,8 @@ class BaseSolution():
         # Inititalise calclation
         self.time = self.start_time
         # Initialize function
-        self.initialize_arrays()
         self.interporate_arrays()
+        self.initialize_arrays()
         self.setup_cantera_array()
         self.average_arrays()
 
@@ -72,30 +72,29 @@ class BaseSolution():
             self.time = n_step*self.dt
             self.time_step()
 
-    def time_step(self):
-        '''Progress a time step'''
-
-        self.G.solve()
-
-    def initialize_arrays(self):
-        '''Initialize solved arrays'''
-        
-        self.G.initialize()
-
     def interporate_arrays(self):
         '''Interpolate required arrays'''
 
         # State variables array
         self.R.interpolate()
         self.V.interpolate()
+        self.G.interpolate()
         self.T.interpolate()
         self.P.interpolate()
-
-        # Species variables array
-        self.X_list.interpolate_species_arrays()
+        self.X_list.interpolate()
 
         # Parameter array
         self.TPG.interpolate()
+        
+    def initialize_arrays(self):
+        '''Initialize solved arrays'''
+        
+        # self.R.initialize()
+        # self.V.initialize()
+        # self.G.initialize()
+        self.T.initialize()
+        # self.P.initialize()
+        # self.Y_list.initialize()
 
     def setup_cantera_array(self):
         '''First setup for cantera array and parameters'''
@@ -140,3 +139,9 @@ class BaseSolution():
 
         self.V.average_variables()
         self.mu.average_variables()
+
+    def time_step(self):
+        '''Progress a time step'''
+
+        self.T.solve()
+

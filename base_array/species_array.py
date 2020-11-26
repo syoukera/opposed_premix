@@ -57,7 +57,7 @@ class SpeciesList():
         # Defilen list of species
         self.list = []
 
-    def interpolate_species_arrays(self):
+    def interpolate(self):
         '''Interpolate each array in list'''
         
         for arr in self.list:
@@ -100,6 +100,9 @@ class MoleFractionList(SpeciesList):
             arr = MoleFractionArray(self.parent_solution, name)
             self.list.append(arr)
 
+    def initialize(self):
+        '''Initialize List of Array'''
+
 class MassFractionList(SpeciesList):
     '''List of Array for Mass Fractions'''
 
@@ -110,3 +113,6 @@ class MassFractionList(SpeciesList):
         for name in self.parent_solution.name_species_cti:
             arr = MassFractionArray(self.parent_solution, name)
             self.list.append(arr)
+
+    def initialize(self):
+        '''Initialize List of Array'''

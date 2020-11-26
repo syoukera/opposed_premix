@@ -49,6 +49,12 @@ class TemperatureArray(StateVariablesArray):
     def __init__(self, parent, var=None):
         super().__init__(parent, var)
         self.name = 'Temperature (K)'
+
+    def initialize(self):
+        '''Initialize array of temperature'''
+        
+        self.variable_array = np.ones(self.num_grid) * 298
+        self.variable_array[int(self.num_grid/4):-int(self.num_grid/4)] = 2000
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''

@@ -84,7 +84,7 @@ class BaseSolution():
         # Species variables array
         self.X_list.interpolate_species_arrays()
         self.assign_TPX_to_cantera()
-        self.get_mole_fraction_from_cantera()
+        self.Y_list.assign_numpy_matrix(self.ct_array.Y)
 
         # Parameter array
         self.mu.interpolate()
@@ -102,6 +102,3 @@ class BaseSolution():
                             self.P.variable_array*1e-1, \
                             self.X_list.get_numpy_matrix()
         self.ct_array.transport_model='Multi'
-
-    def get_mole_fraction_from_cantera(self):
-        '''Get mole fraction form cantera array'''

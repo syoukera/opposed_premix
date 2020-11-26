@@ -69,7 +69,7 @@ class SpeciesList():
     def get_numpy_matrix(self):
         '''
         Retrun numpy matrix for cantera input
-        shape: (num_species, num_grid)
+        shape of ndarray: (num_grid, num_species)
         '''
 
         for i, arr in enumerate(self.list):
@@ -80,6 +80,14 @@ class SpeciesList():
 
         return mat
 
+    def assign_numpy_matrix(self, mat):
+        '''
+        Retrun numpy matrix for cantera input
+        shape of ndarray: (num_grid, num_species)
+        '''
+
+        for mat_arr, spe_array in zip(mat.T, self.list):
+            spe_array.variable_array = mat_arr
 
 class MoleFractionList(SpeciesList):
     '''List of Array for Mole Fractions'''

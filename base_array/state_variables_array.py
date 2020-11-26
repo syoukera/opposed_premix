@@ -114,7 +114,7 @@ class RadialVelocityArray(StateVariablesArray):
         '''Calculate coefficients for TDMA'''
 
         # Read variables from parent soluction
-        mu_s = self.parent_solution.mu.variable_array
+        mu_s = self.parent_solution.mu.variable_array_s
         R    = self.parent_solution.R.variable_array
         V_u  = self.parent_solution.V.variable_array_u
         TPG  = self.parent_solution.TPG.variable_array[0]

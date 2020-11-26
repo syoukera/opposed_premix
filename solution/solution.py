@@ -44,9 +44,6 @@ class BaseSolution():
         self.Y_list = base_array.MassFractionList(parent=self)
 
         # Declear array of parameters
-        # self.mu  = base_array.ParameterArray(parent=self, name='Mixture_viscosity (g/cm-sec)')
-        # self.cp  = base_array.ParameterArray(parent=self, name='Specific_heat_Cp (erg/g-K)')
-        # self.lm  = base_array.ParameterArray(parent=self, name='Mixture_thermal_conductivity (erg/cm-K-sec)')
         self.TPG = base_array.ParameterArray(parent=self, name='Pressure_gradient (g/cm3-s2)')
 
         # Declear array of parameters obtained using cantera
@@ -66,9 +63,10 @@ class BaseSolution():
         # Inititalise calclation
         self.time = self.start_time
         # Initialize function
-        self.interporate_arrays()
-        self.average_arrays()
         self.initialize_arrays()
+        self.interporate_arrays()
+        self.setup_cantera_array()
+        self.average_arrays()
 
         for n_step in range(self.total_step):
             self.time = n_step*self.dt
@@ -95,21 +93,21 @@ class BaseSolution():
 
         # Species variables array
         self.X_list.interpolate_species_arrays()
-        self.assign_TPX_to_cantera()
-        self.Y_list.assign_numpy_matrix(self.ct_array.Y)
 
         # Parameter array
-        # self.mu.interpolate()
         self.TPG.interpolate()
 
-    def average_arrays(self):
-        '''Average operation for required arrays'''
+    def setup_cantera_array(self):
+        '''First setup for cantera array and parameters'''
 
-        self.V.average_variables()
-        self.mu.average_variables()
+        self.assign_TPX_to_cantera()
+        self.Y_list.assign_numpy_matrix(self.ct_array.Y)
+        self.get_parameters_from_cantera()
+
 
     def assign_TPX_to_cantera(self):
         '''Assign TPX to cantera, unit: K, Pa, -'''
+
         self.ct_array.TPX = self.T.variable_array,      \
                             self.P.variable_array*1e-1, \
                             self.X_list.get_numpy_matrix()
@@ -136,3 +134,9 @@ class BaseSolution():
         self.h.variable_array = self.ct_array.partial_molar_enthalpies * 1e4
         # Net production rates for each species. [kmol/m^3/s] for bulk phases. convert to [mol/cm3/s]
         self.wdot.variable_array = self.ct_array.net_production_rates * 1e-3
+
+    def average_arrays(self):
+        '''Average operation for required arrays'''
+
+        self.V.average_variables()
+        self.mu.average_variables()

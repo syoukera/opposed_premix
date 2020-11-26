@@ -180,18 +180,11 @@ class PressureArray(StateVariablesArray):
         self.coef_d = np.ones(self.num_grid) * 1.0
 
 class MoleFractionArray(StateVariablesArray):
-    '''Variable array for pressure'''
+    '''Variable array for mole fraction of a species'''
 
     def __init__(self, parent, name, var=None):
         super().__init__(parent, var)
         self.name = name
-    
-    def calc_coef(self):
-        '''Calculate coefficients for TDMA'''
-        self.coef_a = np.ones(self.num_grid) * 1.0
-        self.coef_b = np.ones(self.num_grid) * 0.0
-        self.coef_c = np.ones(self.num_grid) * 0.0
-        self.coef_d = np.ones(self.num_grid) * 1.0
 
     def interpolate(self):
         '''Interpolate and assign variables from other value arrays'''
@@ -215,7 +208,7 @@ class MoleFractionList():
 
         # Get species name of cti and csv
         # CTI means names from get from cantera chemistry set
-        self.name_species_cti = ct.Solution('gri30.xml').species_names
+        self.name_species_cti = self.parent_solution.name_species_cti
 
         # CK means names imported from CHEMKIN-PRO result
         with open('data/species_name_ck.txt', 'rb') as f:
@@ -224,7 +217,7 @@ class MoleFractionList():
         # Make list of MoleFractionArray
         self.mf_array_list = []
 
-        for name in self.name_species_cti:
+        for name in self.parent_solution.name_species_cti:
             arr = MoleFractionArray(self.parent_solution, name)
             self.mf_array_list.append(arr)
 
@@ -235,4 +228,64 @@ class MoleFractionList():
             if arr.name in self.name_species_ck:
                 arr.interpolate()
             else:
-                arr.variable_array = 0.0
+                arr.variable_array = np.zeros(self.parent_solution.num_grid)
+
+    def get_numpy_matrix(self):
+        '''
+        Retrun numpy matrix for cantera input
+        shape: (num_species, num_grid)
+        '''
+
+        for i, arr in enumerate(self.mf_array_list):
+            if i == 0:
+                X = arr.variable_array.reshape((1, -1))
+            else:
+                X = np.concatenate((X, arr.variable_array.reshape((1, -1))), axis=0)
+
+        return X
+
+class MassFractionArray(StateVariablesArray):
+    '''Variable array for mass fraction of a species'''
+
+    def __init__(self, parent, name, var=None):
+        super().__init__(parent, var)
+        self.name = name
+    
+    def calc_coef(self):
+        '''Calculate coefficients for TDMA'''
+        self.coef_a = np.ones(self.num_grid) * 1.0
+        self.coef_b = np.ones(self.num_grid) * 0.0
+        self.coef_c = np.ones(self.num_grid) * 0.0
+        self.coef_d = np.ones(self.num_grid) * 1.0
+
+    def __init__(self, parent, var=None):
+        # Assign parent solution
+        self.parent_solution = parent
+
+        # CK means names imported from CHEMKIN-PRO result
+        with open('data/species_name_ck.txt', 'rb') as f:
+            self.name_species_ck = pickle.load(f)
+
+        # Make list of MoleFractionArray
+        self.mf_array_list = []
+
+        for name in self.parent_solution.name_species_cti:
+            arr = MoleFractionArray(self.parent_solution, name)
+            self.mf_array_list.append(arr)
+
+class MassFractionList():
+    '''List of Array for Mass Fractions'''
+
+    def __init__(self, parent, var=None):
+        # Assign parent solution
+        self.parent_solution = parent
+
+        # Get species name of cti
+        self.name_species_cti = self.parent_solution.name_species_cti
+
+        # Make list of MoleFractionArray
+        self.mf_array_list = []
+
+        for name in self.parent_solution.name_species_cti:
+            arr = MoleFractionArray(self.parent_solution, name)
+            self.mf_array_list.append(arr)

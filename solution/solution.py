@@ -1,3 +1,4 @@
+import cantera as ct
 import numpy as np
 import pandas as pd
 import base_array
@@ -15,7 +16,7 @@ class BaseSolution():
 
         # calculation time
         self.start_time = 0.0
-        self.end_time   = 1e-3
+        self.end_time   = 1e-4
         self.dt         = 1e-6
 
         # calclation step
@@ -25,12 +26,21 @@ class BaseSolution():
         self.path_ck = 'data/export_OpposedDiffusioon_CH4_GRI.csv'
         self.df_ck = pd.read_csv(self.path_ck)
 
+        # Chemistry file in cantera
+        self.gas = ct.Solution('gri30.xml')
+        self.ct_array = ct.SolutionArray(self.gas, (self.num_grid))
+        self.name_species_cti = self.ct_array.species_names
+
         # Declear array of state variables
         self.R = base_array.DensityArray(parent=self)
         self.P = base_array.PressureArray(parent=self)
         self.T = base_array.TemperatureArray(parent=self)
         self.V = base_array.AxialVelocityArray(parent=self)
         self.G = base_array.RadialVelocityArray(parent=self)
+
+        # Delcear array list of Chemical species
+        self.X_list = base_array.MoleFractionList(parent=self)
+        self.Y_list = base_array.MassFractionList(parent=self)
 
         # Declear array of parameters
         self.mu  = base_array.ParameterArray(parent=self, name='Mixture_viscosity (g/cm-sec)')
@@ -78,4 +88,3 @@ class BaseSolution():
 
         self.V.average_variables()
         self.mu.average_variables()
-

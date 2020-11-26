@@ -53,9 +53,8 @@ class BaseArray():
 
 
 class ParameterArray(BaseArray):
-    '''Variable array for state variables'''
+    '''Variable array for parameter variables'''
 
     def __init__(self, parent, name, var=None):
         super().__init__(parent, var)
         self.name = name
-        self.interpolate()

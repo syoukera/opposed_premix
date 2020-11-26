@@ -30,6 +30,7 @@ class BaseSolution():
         self.gas = ct.Solution('gri30.xml')
         self.ct_array = ct.SolutionArray(self.gas, (self.num_grid))
         self.name_species_cti = self.ct_array.species_names
+        self.num_species = len(self.name_species_cti)
 
         # Declear array of state variables
         self.R = base_array.DensityArray(parent=self)

@@ -58,10 +58,44 @@ class TemperatureArray(StateVariablesArray):
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''
-        self.coef_a = np.ones(self.num_grid) * 1.0
-        self.coef_b = np.ones(self.num_grid) * 0.0
-        self.coef_c = np.ones(self.num_grid) * 0.0
-        self.coef_d = np.ones(self.num_grid) * 1.0
+        lm_s  = self.parent_solution.lm.variable_array_s
+        R     = self.parent_solution.R.variable_array
+        cp_m  = self.parent_solution.cp_m.variable_array
+        cp_i  = self.parent_solution.cp_i.variable_array
+        V_u   = self.parent_solution.V.variable_array_u
+        T_old = self.parent_solution.T_old.variable_array
+        P     = self.parent_solution.P.variable_array
+        P_old = self.parent_solution.P_old.variable_array
+        h     = self.parent_solution.h.variable_array
+        wdot  = self.parent_solution.wdot.variable_array
+
+        for p in range(self.num_grid):
+        
+            # Upper boundary condition
+            if p == 0:
+                self.coef_a[p] = 1.0
+                self.coef_b[p] = 0.0
+                self.coef_c[p] = 0.0
+                self.coef_d[p] = 298
+                continue
+                
+            # Lower boundary condition
+            if p == self.num_grid-1:
+                self.coef_a[p] = 1.0
+                self.coef_b[p] = 0.0
+                self.coef_c[p] = 0.0
+                self.coef_d[p] = 298
+                continue
+
+            # Inner points of numerical grid    
+            C_p = lm_s[p]/(R[p]*cp_m[p]*self.dy**2)
+            C_w = lm_s[p-1]/(R[p]*cp_m[p]*self.dy**2)
+            q_p = 1/(R[p]*cp_m[p])*np.dot(cp_i[p, :], j_diff[p, :])
+            
+            self.coef_a[p] = 1/self.dt + C_p + C_w + np.abs(V_u[p]/self.dy) + np.abs(q_p/self.dy)
+            self.coef_b[p] = C_p + max(0, -V_u[p]/self.dy) + max(0, -q_p/self.dy)
+            self.coef_c[p] = C_w + max(0, +V_u[p]/self.dy) + max(0, +q_p/self.dy)
+            self.coef_d[p] = T_old[p]/self.dt + (P[p] - P_old[p])/(R[p]*self.dt) - np.dot(h[p, :], wdot[p, :])/(R[p]*cp_m[p])
 
 class DensityArray(StateVariablesArray):
     '''Variable array for density'''

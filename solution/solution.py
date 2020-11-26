@@ -39,9 +39,17 @@ class BaseSolution():
         self.V = base_array.AxialVelocityArray(parent=self)
         self.G = base_array.RadialVelocityArray(parent=self)
 
+        # Declear array of old varialbes
+        self.R_old = np.zeros(self.num_grid)
+        self.P_old = np.zeros(self.num_grid)
+        self.T_old = np.zeros(self.num_grid)
+        self.V_old = np.zeros(self.num_grid)
+        self.G_old = np.zeros(self.num_grid)
+        self.Y_old = np.zeros((self.num_grid, self.num_species))
+
         # Delcear array list of Chemical species
         self.X_list = base_array.MoleFractionList(parent=self)
-        self.Y_list = base_array.MassFractionList(parent=self)
+        self.Y_list = base_array.MassFractionList(parent=self)  
 
         # Declear array of parameters
         self.TPG = base_array.ParameterArray(parent=self, name='Pressure_gradient (g/cm3-s2)')
@@ -69,6 +77,9 @@ class BaseSolution():
         self.average_arrays()
 
         for n_step in range(self.total_step):
+
+            self.save_old_value()
+
             self.time = n_step*self.dt
             self.time_step()
 
@@ -139,6 +150,16 @@ class BaseSolution():
 
         self.V.average_variables()
         self.mu.average_variables()
+        self.lm.average_variables()
+
+    def save_old_value(self):
+        '''Save old value of state variables'''
+        self.R_old = self.R.variable_array
+        self.P_old = self.P.variable_array
+        self.T_old = self.T.variable_array
+        self.V_old = self.V.variable_array
+        self.G_old = self.G.variable_array
+        self.Y_old = self.Y_list.get_numpy_matrix()
 
     def time_step(self):
         '''Progress a time step'''

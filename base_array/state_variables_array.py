@@ -170,7 +170,22 @@ class PressureArray(StateVariablesArray):
 
     def __init__(self, parent, var=None):
         super().__init__(parent, var)
-        self.name = 'Pressure (atm)'
+        self.name = 'Pressure (g/cm/s2)'
+
+    def interpolate(self):
+        '''
+        Interpolate and assign variables from other value arrays
+        Converted to cgs-unit [g/cm/s2] from [atm]
+        '''
+
+        df_ck = self.parent_solution.df_ck
+
+        dis = df_ck['Distance (cm)'].to_numpy()
+        phi = df_ck['Pressure (atm)'].to_numpy()
+        phi_cgs = phi*1013250
+
+        f = interp.interp1d(dis, phi_cgs, kind="cubic")
+        self.variable_array = f(self.y)
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''

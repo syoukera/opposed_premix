@@ -74,9 +74,9 @@ class SpeciesList():
 
         for i, arr in enumerate(self.list):
             if i == 0:
-                mat = arr.variable_array.reshape((1, -1))
+                mat = arr.variable_array.reshape((-1, 1))
             else:
-                mat = np.concatenate((mat, arr.variable_array.reshape((1, -1))), axis=0)
+                mat = np.concatenate((mat, arr.variable_array.reshape((-1, 1))), axis=1)
 
         return mat
 

@@ -76,8 +76,15 @@ class BaseSolution():
         '''Interpolate required arrays'''
 
         # State variables array
-        self.V.interpolate()
         self.R.interpolate()
+        self.V.interpolate()
+        self.T.interpolate()
+        self.P.interpolate()
+
+        # Species variables array
+        self.X_list.interpolate_species_arrays()
+        self.assign_TPX_to_cantera()
+        self.get_mole_fraction_from_cantera()
 
         # Parameter array
         self.mu.interpolate()
@@ -88,3 +95,13 @@ class BaseSolution():
 
         self.V.average_variables()
         self.mu.average_variables()
+
+    def assign_TPX_to_cantera(self):
+        '''Assign TPX to cantera, unit: K, Pa, -'''
+        self.ct_array.TPX = self.T.variable_array,      \
+                            self.P.variable_array*1e-1, \
+                            self.X_list.get_numpy_matrix()
+        self.ct_array.transport_model='Multi'
+
+    def get_mole_fraction_from_cantera(self):
+        '''Get mole fraction form cantera array'''

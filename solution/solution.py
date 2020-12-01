@@ -81,8 +81,11 @@ class BaseSolution():
 
             self.save_old_value()
 
+            # Prepare parameters
             self.setup_cantera_array()
+            self.average_arrays()
 
+            # Time evolution
             self.time = n_step*self.dt
             self.time_step()
 
@@ -152,6 +155,7 @@ class BaseSolution():
         '''Average operation for required arrays'''
 
         self.V.average_variables()
+        self.R.average_variables()
         self.mu.average_variables()
         self.lm.average_variables()
 

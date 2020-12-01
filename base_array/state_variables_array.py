@@ -252,9 +252,41 @@ class PressureArray(StateVariablesArray):
         f = interp.interp1d(dis, phi_cgs, kind="cubic")
         self.variable_array = f(self.y)
     
+
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''
-        self.coef_a = np.ones(self.num_grid) * 1.0
-        self.coef_b = np.ones(self.num_grid) * 0.0
-        self.coef_c = np.ones(self.num_grid) * 0.0
-        self.coef_d = np.ones(self.num_grid) * 1.0
+
+        # Read variables from parent soluction
+        R = self.parent_solution.R.variable_array
+        R_s = self.parent_solution.R.variable_array_s
+        R_old = self.parent_solution.R_old
+        G = self.parent_solution.G.variable_array
+        V = self.parent_solution.V.variable_array
+
+        '''Calculation of d'''
+        d = np.zeros(self.num_grid)
+
+        for p in range(self.num_grid):
+        
+            # Upper boundary condition
+            if p == 0:
+                self.coef_a[p] = 1.0
+                self.coef_b[p] = 0.0
+                self.coef_c[p] = 0.0
+                self.coef_d[p] = 1013250
+                continue
+                
+            # Lower boundary condition
+            if p == self.num_grid-1:
+                self.coef_a[p] = 1.0
+                self.coef_b[p] = 0.0
+                self.coef_c[p] = 0.0
+                self.coef_d[p] = 1013250
+                continue
+            
+            # Inner points of numerical grid    
+            self.coef_a[p] = R_s[p]*d[p]/self.dy + R_s[p-1]*d[p-1]/self.dy
+            self.coef_b[p] = R_s[p]*d[p]/self.dy
+            self.coef_c[p] = R_s[p-1]*d[p-1]/self.dy
+            self.coef_d[p] = - (R[p] - R_old[p])/self.dy - 2*R[p]*G[p] \
+                             - (R_s[p]*V[p] - R_s[p-1]*V[p-1])/self.dy

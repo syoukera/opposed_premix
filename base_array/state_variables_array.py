@@ -145,7 +145,7 @@ class AxialVelocityArray(StateVariablesArray):
 
     def initialize(self):
         '''Initialize variable array for simulation'''
-        self.variable_array = np.linspace(100, -100, num_grid)
+        self.variable_array = np.linspace(100, -100, self.num_grid)
     
     def average_variables(self):
         '''

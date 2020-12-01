@@ -102,16 +102,6 @@ class BaseSolution():
 
         # Parameter array
         self.TPG.interpolate()
-        
-    def initialize_arrays(self):
-        '''Initialize solved arrays'''
-        
-        # self.R.initialize()
-        # self.V.initialize()
-        # self.G.initialize()
-        self.T.initialize()
-        # self.P.initialize()
-        # self.Y_list.initialize()
 
     def setup_cantera_array(self):
         '''First setup for cantera array and parameters'''
@@ -168,8 +158,47 @@ class BaseSolution():
         self.G_old = self.G.variable_array
         self.Y_old = self.Y_list.get_numpy_matrix()
 
+class TemperatureSolution(BaseSolution):
+    '''Solution for just solving temperature'''
+
+        
+    def initialize_arrays(self):
+        '''Initialize solved arrays'''
+        
+        # self.R.initialize()
+        # self.V.initialize()
+        # self.G.initialize()
+        self.T.initialize()
+        # self.P.initialize()
+        # self.Y_list.initialize()
+
+
     def time_step(self):
         '''Progress a time step'''
 
         self.T.solve()
 
+
+class SimpleSolution(BaseSolution):
+    '''
+    Solution for just solving axial velocity and temperature 
+    using SIMPLE method
+    '''
+
+        
+    def initialize_arrays(self):
+        '''Initialize solved arrays'''
+        
+        # self.R.initialize()
+        self.V.initialize()
+        # self.G.initialize()
+        # self.T.initialize()
+        self.P.initialize()
+        # self.Y_list.initialize()
+
+    def time_step(self):
+        '''Progress a time step using SIMPLE Method'''
+
+        
+
+        self.P.solve()

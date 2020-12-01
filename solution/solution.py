@@ -23,6 +23,9 @@ class BaseSolution():
         # calclation step
         self.total_step = int(self.end_time/self.dt)
 
+        # maximum number fo simple loop
+        self.max_loop = 1000
+
         # Path to csv file exported using CHEMKIN-PRO
         self.path_ck = 'data/export_OpposedDiffusioon_CH4_GRI.csv'
         self.df_ck = pd.read_csv(self.path_ck)
@@ -199,6 +202,44 @@ class SimpleSolution(BaseSolution):
     def time_step(self):
         '''Progress a time step using SIMPLE Method'''
 
-        
+        for n_roop in range(self.max_loop):
 
-        self.P.solve()
+            self.simple_loop()
+
+            # Check convergence
+            residual = 1.0
+            if residual < 1e-6:
+                break
+
+
+    def simple_loop(self):
+        '''One loop for SIMPLE Method'''
+
+        # step 1: set P*
+        P_star = self.P.variable_array
+
+        # step 2: get V*
+        V_star = self.V.get_V_star()
+        
+        '''Use V_star to caluclate P_dash'''
+
+        # step 3: get P'
+        P_dash = self.P.calc_P_dash()
+
+        # step 4: get P
+        self.P.variable_array = P_star + P_dash
+
+        # step 5: get V
+        R_s = self.R.variable_array_s
+        coef_a_V = self.V.coef_a
+        d = 1/np.multiply(R_s, coef_a_V)*self.dy
+
+        dP = np.zeros(self.num_grid)
+        dP[:-1] = np.diff(self.P.variable_array)
+        
+        V_dash = np.multiply(d, dP)
+        self.V.variable_array = V_star + V_dash
+
+        # step 6: get dependent variables
+        self.setup_cantera_array()
+        self.average_arrays()        

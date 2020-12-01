@@ -142,6 +142,10 @@ class AxialVelocityArray(StateVariablesArray):
     def __init__(self, parent, var=None):
         super().__init__(parent, var)
         self.name = 'Axial_velocity (cm/sec)'
+
+    def initialize(self):
+        '''Initialize variable array for simulation'''
+        self.variable_array = np.linspace(100, -100, num_grid)
     
     def average_variables(self):
         '''
@@ -272,6 +276,10 @@ class PressureArray(StateVariablesArray):
         super().__init__(parent, var)
         self.name = 'Pressure (g/cm/s2)'
 
+    def initialize(self):
+        '''Initialize variable array for simulation'''
+        self.variable_array = 1013250
+
     def interpolate(self):
         '''
         Interpolate and assign variables from other value arrays
@@ -299,7 +307,8 @@ class PressureArray(StateVariablesArray):
         V = self.parent_solution.V.variable_array
 
         '''Calculation of d'''
-        d = np.zeros(self.num_grid)
+        coef_a_V = self.parent_solution.V.coef_a
+        d = 1/np.multiply(R_s, coef_a_V)*self.dy
 
         for p in range(self.num_grid):
         

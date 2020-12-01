@@ -81,6 +81,8 @@ class BaseSolution():
 
             self.save_old_value()
 
+            self.setup_cantera_array()
+
             self.time = n_step*self.dt
             self.time_step()
 

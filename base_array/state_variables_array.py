@@ -156,10 +156,45 @@ class AxialVelocityArray(StateVariablesArray):
     
     def calc_coef(self):
         '''Calculate coefficients for TDMA'''
-        self.coef_a = np.ones(self.num_grid) * 1.0
-        self.coef_b = np.ones(self.num_grid) * 0.0
-        self.coef_c = np.ones(self.num_grid) * 0.0
-        self.coef_d = np.ones(self.num_grid) * 1.0
+
+        # Read variables from parent soluction
+        mu    = self.parent_solution.mu.variable_array 
+        mu_s  = self.parent_solution.mu.variable_array_s 
+        R_s   = self.parent_solution.R.variable_array_s
+        V     = self.parent_solution.V.variable_array
+        V_old = self.parent_solution.V_old
+        P     = self.parent_solution.P.variable_array
+        G     = self.parent_solution.G.variable_array
+
+        for p in range(self.num_grid):
+        
+            # Upper boundary condition
+            if p == 0:
+                self.coef_a[p] = 1.0
+                self.coef_b[p] = 0.0
+                self.coef_c[p] = 0.0
+                self.coef_d[p] = 100
+                continue
+                
+            # Lower boundary condition
+            if p == self.num_grid-1:
+                self.coef_a[p] = 1.0
+                self.coef_b[p] = 0.0
+                self.coef_c[p] = 0.0
+                self.coef_d[p] = -100
+                continue
+
+            
+            # Inner points of numerical grid    
+            C_E = 4*mu[p+1]/(3*R_s[p]*self.dy**2)
+            C_P = 4*mu[p]/(3*R_s[p]*self.dy**2)
+
+            self.coef_a[p] = 1/self.dt + C_E + C_P + np.abs(V[p]/self.dy)
+            self.coef_b[p] = C_E + np.max(0, -V[p]/self.dy)
+            self.coef_c[p] = C_P + np.max(0, +V[p]/self.dy)
+            self.coef_d[p] = V_old[p]/self.dt - (P[p+1] - P[p])/(R_s[p]/self.dy) \
+                           - C_E*G[p+1]*self.dy + C_P*G[p]*self.dy \
+                           + 2*mu_s[p]*(G[p+1] - G[p])/(R_s[p]*self.dy)
 
 class RadialVelocityArray(StateVariablesArray):
     '''Variable array for radial velocity'''

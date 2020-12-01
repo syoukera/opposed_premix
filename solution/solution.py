@@ -216,18 +216,16 @@ class SimpleSolution(BaseSolution):
         '''One loop for SIMPLE Method'''
 
         # step 1: set P*
-        P_star = self.P.variable_array
+        self.P_star = self.P.variable_array
 
         # step 2: get V*
-        V_star = self.V.get_V_star()
-        
-        '''Use V_star to caluclate P_dash'''
+        self.V_star = self.V.calc_intermediate_phi()
 
         # step 3: get P'
-        P_dash = self.P.calc_P_dash()
+        P_dash = self.P.calc_intermediate_phi()
 
         # step 4: get P
-        self.P.variable_array = P_star + P_dash
+        self.P.variable_array = self.P_star + P_dash
 
         # step 5: get V
         R_s = self.R.variable_array_s
@@ -238,7 +236,7 @@ class SimpleSolution(BaseSolution):
         dP[:-1] = np.diff(self.P.variable_array)
         
         V_dash = np.multiply(d, dP)
-        self.V.variable_array = V_star + V_dash
+        self.V.variable_array = self.V_star + V_dash
 
         # step 6: get dependent variables
         self.setup_cantera_array()

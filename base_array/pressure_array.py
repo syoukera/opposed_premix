@@ -39,9 +39,11 @@ class PressureArray(StateVariablesArray):
         R_s = self.parent_solution.R.variable_array_s
         R_old = self.parent_solution.R_old
         G = self.parent_solution.G.variable_array
-        V = self.parent_solution.V.variable_array
 
-        '''Calculation of d'''
+        '''V should be changed to V_star'''
+        V = self.parent_solution.V_star
+
+        # Calculation of d
         coef_a_V = self.parent_solution.V.coef_a
         d = 1/np.multiply(R_s, coef_a_V)*self.dy
 
@@ -69,3 +71,11 @@ class PressureArray(StateVariablesArray):
             self.coef_c[p] = R_s[p-1]*d[p-1]/self.dy
             self.coef_d[p] = - (R[p] - R_old[p])/self.dy - 2*R[p]*G[p] \
                              - (R_s[p]*V[p] - R_s[p-1]*V[p-1])/self.dy
+
+    def calc_P_dash(self):
+        '''Calculate P' for step 3 in Simple loop'''
+        
+        self.calc_coef()
+        P_dash = self.get_phi_TDMA()
+
+        return P_dash

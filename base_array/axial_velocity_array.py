@@ -34,8 +34,10 @@ class AxialVelocityArray(StateVariablesArray):
         R_s   = self.parent_solution.R.variable_array_s
         V     = self.parent_solution.V.variable_array
         V_old = self.parent_solution.V_old
-        P     = self.parent_solution.P.variable_array
         G     = self.parent_solution.G.variable_array
+
+        '''P should be changed to P_star'''
+        P = self.parent_solution.P_star
 
         for p in range(self.num_grid):
         

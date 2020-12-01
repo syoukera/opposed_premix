@@ -1,6 +1,7 @@
 import cantera as ct
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import base_array
 
 class BaseSolution():
@@ -76,7 +77,7 @@ class BaseSolution():
         self.setup_cantera_array()
         self.average_arrays()
 
-        for n_step in range(self.total_step):
+        for n_step in tqdm(range(self.total_step)):
 
             self.save_old_value()
 
